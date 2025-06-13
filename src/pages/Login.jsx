@@ -4,13 +4,16 @@ import API from "../utils/api";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useAuth } from "../context/AuthContext";
+import { useState } from "react";
 
 export default function Login() {
   const { login } = useAuth();
   const { register, handleSubmit } = useForm();
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
   const onSubmit = async (data) => {
+    setLoading(true);
     try {
       const res = await API.post("/auth/login", data);
       if (!res.data.success) {
@@ -24,6 +27,8 @@ export default function Login() {
     } catch (error) {
       toast.error("Login failed. Please try again.");
       console.error("Login error:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -49,7 +54,13 @@ export default function Login() {
             type="submit"
             className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 rounded transition duration-200"
           >
-            Login
+            {loading ? (
+              <div className="flex justify-center">
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              </div>
+            ) : (
+              "Login"
+            )}
           </button>
         </form>
         <div className="mt-6 text-center text-sm text-gray-600">

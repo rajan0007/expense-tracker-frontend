@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import API from "../utils/api";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { useState } from "react";
 
 export default function Register() {
   const {
@@ -14,10 +15,11 @@ export default function Register() {
 
   const navigate = useNavigate();
   const password = watch("password");
-
+  const [loading, setLoading] = useState(false);
   const onSubmit = async (data) => {
+    setLoading(true);
     try {
-      delete data.confirmPassword; // remove confirmPassword before API call
+      delete data.confirmPassword;
       const res = await API.post("/auth/register", data);
       if (!res.data.success) {
         toast.error(res.data.message || "Registration failed");
@@ -32,6 +34,8 @@ export default function Register() {
           "Registration failed. Please try again."
       );
       console.error("Registration error:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -43,7 +47,6 @@ export default function Register() {
         </h2>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          {/* Name */}
           <div>
             <label
               htmlFor="name"
@@ -61,8 +64,6 @@ export default function Register() {
               <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
             )}
           </div>
-
-          {/* Email */}
           <div>
             <label
               htmlFor="email"
@@ -89,8 +90,6 @@ export default function Register() {
               </p>
             )}
           </div>
-
-          {/* Password */}
           <div>
             <label
               htmlFor="password"
@@ -117,8 +116,6 @@ export default function Register() {
               </p>
             )}
           </div>
-
-          {/* Confirm Password */}
           <div>
             <label
               htmlFor="confirmPassword"
@@ -143,17 +140,19 @@ export default function Register() {
               </p>
             )}
           </div>
-
-          {/* Submit Button */}
           <button
             type="submit"
             className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 rounded transition duration-200"
           >
-            Register
+            {loading ? (
+              <div className="flex justify-center">
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              </div>
+            ) : (
+              "Register"
+            )}
           </button>
         </form>
-
-        {/* Login Link */}
         <div className="mt-6 text-center text-sm text-gray-600">
           Already have an account?
           <Link

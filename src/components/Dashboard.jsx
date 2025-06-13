@@ -53,12 +53,16 @@ const Dashboard = () => {
     }
   };
 
+  const isEmpty = !categoryTotals || Object.keys(categoryTotals).length === 0;
+
   const chartData = {
-    labels: CATEGORIES,
+    labels: isEmpty ? ["No Data Found"] : CATEGORIES,
     datasets: [
       {
-        data: CATEGORIES.map((cat) => categoryTotals[cat] || 0),
-        backgroundColor: COLORS,
+        data: isEmpty
+          ? [1] // full grey pie
+          : CATEGORIES.map((cat) => categoryTotals[cat] || 0),
+        backgroundColor: isEmpty ? ["#d1d5db"] : COLORS,
         borderColor: "#fff",
         borderWidth: 1,
       },
@@ -71,11 +75,13 @@ const Dashboard = () => {
     cutout: "70%",
     plugins: {
       tooltip: {
+        enabled: !isEmpty,
         callbacks: {
           label: (context) => `${context.label}: ₹${context.raw}`,
         },
       },
       legend: {
+        display: !isEmpty,
         position: "bottom",
         labels: {
           color: "#374151",

@@ -10,10 +10,19 @@ export default function Expenses() {
   const [expenses, setExpenses] = useState([]);
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
   const fetchExpenses = async () => {
-    const res = await API.get("/expenses");
-    setExpenses(res.data || []);
+    setLoading(true);
+    try {
+      const res = await API.get("/expenses");
+      setExpenses(res.data || []);
+    } catch (error) {
+      console.error("Failed to fetch expenses:", error);
+      toast.error("Failed to load expenses.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleDelete = (id) => {
@@ -99,9 +108,17 @@ export default function Expenses() {
             </tr>
           </thead>
           <tbody>
-            {filtered.length === 0 ? (
+            {loading ? (
               <tr>
-                <td colSpan="5" className="text-center py-4">
+                <td colSpan="6" className="text-center py-6">
+                  <div className="flex justify-center">
+                    <div className="w-6 h-6 border-4 border-green-500 border-t-transparent rounded-full animate-spin"></div>
+                  </div>
+                </td>
+              </tr>
+            ) : filtered.length === 0 ? (
+              <tr>
+                <td colSpan="6" className="text-center py-4">
                   No expenses found.
                 </td>
               </tr>
